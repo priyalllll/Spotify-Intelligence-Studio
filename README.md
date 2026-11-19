@@ -1,14 +1,14 @@
-# Spotify Intelligence Studio
+﻿# Spotify Intelligence Studio
 
 ### An AI-Powered Music Analytics & Intelligence Platform
 
-\<p align="center">
-&#x20; \<strong>Transforming Spotify listening data into meaningful music intelligence.\</strong>
-\</p>
+<p align="center">
+<strong>Transforming Spotify listening data into meaningful music intelligence.</strong>
+</p>
 
-\<p align="center">
-&#x20; A full-stack analytics platform that connects with Spotify, retrieves user music data, analyzes listening preferences, explores artist and track insights, and presents music intelligence through interactive dashboards.
-\</p>
+<p align="center">
+A full-stack analytics platform that connects with Spotify, retrieves user music data, analyzes listening preferences, explores artist and track insights, and presents music intelligence through interactive dashboards.
+</p>
 
 ---
 
@@ -507,4 +507,4 @@ Spotify is a trademark of Spotify AB. This project is an independent application
 
 ---
 
-\<p align="center">   \<strong>Spotify Intelligence Studio\</strong>   \<br/>   Turning Music Data Into Intelligence. \</p>
+<p align="center">   <strong>Spotify Intelligence Studio</strong>   \<br/>   Turning Music Data Into Intelligence. </p>
