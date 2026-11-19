@@ -1,28 +1,28 @@
-﻿<h1 align="center">Spotify Intelligence Studio</h1>
+<h1 align="center">🎵 Spotify Intelligence Studio</h1>
 
-<h3 align="center">An AI-Powered Music Analytics &amp; Intelligence Platform</h3>
+<h3 align="center">An AI-Powered Music Analytics & Intelligence Platform</h3>
 
 <p align="center">
-<strong>Transforming Spotify listening data into meaningful music intelligence.</strong>
+  <strong>Transforming Spotify listening data into meaningful music intelligence.</strong>
 </p>
 
 <p align="center">
-A full-stack analytics platform that connects with Spotify, retrieves user music data, analyzes listening preferences, explores artist and track insights, and presents music intelligence through interactive dashboards.
+  A full-stack analytics platform that connects with Spotify, retrieves user music data,<br/>
+  analyzes listening preferences, and presents music intelligence through interactive dashboards.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/>
+  <img src="https://img.shields.io/badge/TypeScript-6-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js"/>
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS"/>
+  <img src="https://img.shields.io/badge/Spotify-API-1DB954?style=for-the-badge&logo=spotify&logoColor=white" alt="Spotify API"/>
+  <img src="https://img.shields.io/badge/Gemini-AI-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Gemini AI"/>
 </p>
 
 ---
 
-## Project Overview
-
-**Spotify Intelligence Studio** is a full-stack music analytics platform designed to provide users with a deeper understanding of their Spotify listening behavior.
-
-The application integrates with the Spotify Web API using OAuth 2.0 authentication to retrieve authorized user information, artists, tracks, and playlists.
-
-Instead of simply displaying music information, the platform organizes Spotify data into interactive dashboards, analytical visualizations, artist rankings, track statistics, playlist insights, and AI-powered recommendations.
-
-The objective is to transform raw music data into an intuitive and visually engaging intelligence platform.
-
-## Dashboard Preview
+## 🖥️ Preview
 
 ### Landing Page
 
@@ -30,322 +30,175 @@ The objective is to transform raw music data into an intuitive and visually enga
 
 > *The landing page as seen when the project is first opened on localhost.*
 
+---
 
+## 📖 Project Overview
 
-### Artist Intelligence
+**Spotify Intelligence Studio** is a full-stack music analytics platform designed to give users a deeper understanding of their Spotify listening behavior.
 
+The application integrates with the **Spotify Web API** using **OAuth 2.0 with PKCE** authentication to securely retrieve user information, top artists, tracks, and playlists.
 
-
-### Track Analytics
-
-
-
-### Playlist Intelligence
-
-
-
-### User Profile
-
-
-
-### AI Insights
-
-
+Instead of simply displaying music data, the platform organizes it into interactive dashboards, analytical visualizations, artist rankings, track statistics, playlist insights, and AI-powered recommendations — transforming raw music data into an intuitive intelligence experience.
 
 ---
 
-## Key Features
+## ✨ Key Features
 
-### 1. Spotify Account Integration
-
-- Secure Spotify account authentication using OAuth 2.0 with PKCE.
-- Access to authorized Spotify user information.
-- Retrieval of Spotify profile details.
-- Access-token management and refresh-token handling.
-- Backend communication with Spotify Web API.
-
-### 2. Interactive Analytics Dashboard
-
-- Centralized music analytics dashboard.
-- Total tracks and artists overview.
-- Playlist statistics.
-- Listening-related metrics where supported by available data.
-- Favorite genre and artist insights where calculated from available data.
-- Interactive charts and analytical visualizations.
-- Multiple time-range selection options.
-
-### 3. Artist Intelligence
-
-- Explore top Spotify artists.
-- Artist ranking and popularity analysis.
-- Artist profile information.
-- Artist affinity comparisons.
-- Identification of frequently appearing artists.
-- Visual artist analytics.
-
-### 4. Track Analytics & Features
-
-- Retrieve and display Spotify tracks.
-- Track popularity information.
-- Track duration analysis.
-- Track ranking and sorting.
-- Search functionality.
-- Album and artist information.
-- Track-level analytical comparisons.
-
-### 5. Playlist Intelligence
-
-- Retrieve the user's Spotify playlists.
-- Display playlist information.
-- Explore playlist collections.
-- Analyze available playlist metadata.
-- Organize playlist information through an interactive interface.
-
-### 6. AI-Powered Insights
-
-- AI-assisted music intelligence.
-- Listening preference analysis.
-- Personalized music-related insights.
-- AI-generated summaries and recommendations.
-
-*AI-generated results depend on the configured AI integration and the data supplied to it.*
-
-### 7. Intelligence Reports
-
-- Consolidated music analytics.
-- Artist and track insights.
-- Visual analytical summaries.
-- Music preference observations.
-- Structured intelligence reporting.
-
-### 8. Intelligence Scores
-
-- Analytical scoring interface.
-- Music preference indicators.
-- Artist and track comparison metrics.
-- Visual representation of calculated insights.
-
-### 9. User Profile
-
-- Spotify profile information.
-- Display name and profile image.
-- Spotify account country.
-- Account type.
-- Follower information where available.
-- Listening statistics and achievements where supported by the application data.
-
-### 10. Application Settings
-
-- User-facing application settings.
-- Dashboard preferences.
-- Interface configuration.
+| Feature | Description |
+|---|---|
+| 🔐 **Spotify OAuth 2.0** | Secure login with PKCE flow and token management |
+| 📊 **Analytics Dashboard** | Interactive charts, genre insights, time-range filters |
+| 🎤 **Artist Intelligence** | Top artist rankings, popularity analysis, affinity scores |
+| 🎵 **Track Analytics** | Track stats, duration analysis, popularity rankings |
+| 📂 **Playlist Intelligence** | Playlist metadata, collection explorer |
+| 🤖 **AI Insights** | Gemini-powered listening preference analysis |
+| 📋 **Intelligence Reports** | Consolidated music analytics & summaries |
+| 👤 **User Profile** | Spotify profile, account info, listening stats |
+| ⚙️ **App Settings** | Dashboard preferences and interface config |
 
 ---
 
-## Technology Stack
+## 🛠️ Technology Stack
 
-| Category          | Technologies           |
-| ----------------- | ---------------------- |
-| Frontend          | React.js, TypeScript   |
-| Styling           | Tailwind CSS           |
-| Icons             | Lucide React           |
-| Backend           | Node.js, Express.js    |
-| Authentication    | Spotify OAuth 2.0 PKCE |
-| External API      | Spotify Web API        |
-| Database          | PostgreSQL             |
-| ORM               | Prisma                 |
-| AI Integration    | Google Gemini API      |
-| Development Tools | Vite, npm, Git, GitHub |
+### Frontend
+| Technology | Version | Purpose |
+|---|---|---|
+| **React** | 19 | UI Framework |
+| **TypeScript** | 6 | Type Safety |
+| **Vite** | 8 | Build Tool & Dev Server |
+| **Tailwind CSS** | 4 | Utility-first Styling |
+| **React Router DOM** | 7 | Client-side Routing |
+| **Framer Motion** | 13 | Animations & Transitions |
+| **Recharts** | 3 | Data Visualization & Charts |
+| **Lucide React** | latest | Icon Library |
+| **React Icons** | 5 | Additional Icons |
+| **Axios** | 1 | HTTP Client |
+
+### Backend
+| Technology | Version | Purpose |
+|---|---|---|
+| **Node.js** | LTS | Runtime Environment |
+| **Express.js** | 4 | Web Framework |
+| **TypeScript** | 5 | Type Safety |
+| **spotify-web-api-node** | 5 | Spotify API Wrapper |
+| **Axios** | 1 | HTTP Requests |
+| **dotenv** | 16 | Environment Variables |
+| **cors** | 2 | Cross-Origin Resource Sharing |
+| **nodemon** | 3 | Dev Auto-reload |
+
+### Services & Integrations
+| Service | Purpose |
+|---|---|
+| **Spotify Web API** | Music data, user info, top tracks & artists |
+| **Spotify OAuth 2.0 PKCE** | Secure authentication |
+| **Google Gemini API** | AI-powered music insights |
+| **PostgreSQL + Prisma** | Database & ORM |
 
 ---
 
-## System Architecture
+## 🏗️ System Architecture
 
-The application follows a frontend-backend architecture.
-
-```text
-              USER
-                |
-                v
-       REACT FRONTEND
-                |
-                v
-       SPOTIFY LOGIN
-                |
-                v
-       OAUTH 2.0 PKCE
-                |
-                v
-        SPOTIFY AUTH
-                |
-                v
-       AUTHORIZATION
-                |
-                v
-       EXPRESS BACKEND
-                |
-                v
-        SPOTIFY WEB API
-                |
-                v
-       SPOTIFY USER DATA
-                |
-                v
-       DATA PROCESSING
-                |
-         +------+------+
-         |             |
-         v             v
-      DATABASE       AI SERVICE
-     POSTGRESQL       GEMINI
-         |             |
-         +------+------+
-                |
-                v
-       ANALYTICS ENGINE
-                |
-                v
-       REACT DASHBOARD
-                |
-                v
-       VISUAL INSIGHTS
+```
+        USER BROWSER
+             │
+             ▼
+     React Frontend (Vite)
+     TypeScript + Tailwind
+             │
+      ┌──────┴──────┐
+      │             │
+      ▼             ▼
+ Spotify OAuth   Express Backend
+ 2.0 / PKCE      (Node.js + TS)
+      │             │
+      ▼             ▼
+ Spotify Auth    Spotify Web API
+   Tokens              │
+      │          ┌─────┴─────┐
+      └────►     │           │
+           Data  ▼           ▼
+        Processing      Gemini AI
+             │          API
+        ┌────┴────┐
+        ▼         ▼
+   PostgreSQL  Analytics
+   (Prisma)    Engine
+        └────┬────┘
+             ▼
+      React Dashboards
+       Visual Insights
 ```
 
-### Application Workflow
+---
 
-1. The user opens Spotify Intelligence Studio.
-2. The user connects their Spotify account.
-3. Spotify redirects the user through its authorization process.
-4. The application obtains the required authorization tokens.
-5. The backend communicates with Spotify Web API.
-6. Spotify returns the information permitted by the user's authorization scopes.
-7. The application processes and organizes the retrieved information.
-8. Relevant information is displayed through dashboard components.
-9. Analytical and AI-assisted features generate additional insights where configured.
+## 📡 Spotify API Endpoints
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /v1/me` | Retrieve Spotify user profile |
+| `GET /v1/me/top/artists` | Retrieve user's top artists |
+| `GET /v1/me/top/tracks` | Retrieve user's top tracks |
+| `GET /v1/me/playlists` | Retrieve user's playlists |
+| `GET /v1/artists/{id}` | Retrieve artist details |
+| `GET /v1/tracks/{id}` | Retrieve track details |
 
 ---
 
-## Spotify API Integration
+## 📁 Project Structure
 
-Spotify Web API is the primary external data source for this application.
-
-The backend communicates with Spotify endpoints to retrieve authorized account information.
-
-Examples of API resources used by the application include:
-
-| API Endpoint         | Purpose                       |
-| -------------------- | ----------------------------- |
-| `/v1/me`             | Retrieve Spotify user profile |
-| `/v1/me/top/artists` | Retrieve top artists          |
-| `/v1/me/top/tracks`  | Retrieve top tracks           |
-| `/v1/me/playlists`   | Retrieve user playlists       |
-| `/v1/artists/{id}`   | Retrieve artist information   |
-| `/v1/tracks/{id}`    | Retrieve track information    |
-
-The actual availability of each endpoint depends on Spotify API access, granted scopes, and current Spotify platform policies.
-
-### Authentication
-
-The project uses Spotify OAuth 2.0 PKCE authentication.
-
-The authentication workflow involves:
-
-- Authorization request.
-- Code verifier generation.
-- Code challenge generation.
-- User authorization.
-- Authorization-code exchange.
-- Access-token management.
-- Refresh-token handling.
-
-Access tokens are used to authorize API requests.
-
-The backend handles token-related operations and communication with Spotify.
-
-**Security note:** Access tokens, refresh tokens, client secrets, and other credentials must never be committed to GitHub.
-
----
-
-## Project Structure
-
-The project is organized into separate frontend and backend directories.
-
-```text
+```
 Spotify-Intelligence-Studio/
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── views/
-│   │   ├── pages/
-│   │   ├── services/
-│   │   └── App.tsx
-│   │
-│   ├── public/
-│   ├── package.json
-│   └── vite.config.ts
+├── frontend/                    # React + Vite + TypeScript
+│   └── src/
+│       ├── components/          # Reusable UI components
+│       ├── views/               # Page-level view components
+│       ├── pages/               # Route pages
+│       ├── services/            # API service layer
+│       └── App.tsx
 │
-├── backend/
-│   ├── routes/
-│   ├── controllers/
-│   ├── middleware/
-│   ├── prisma/
-│   ├── services/
-│   ├── package.json
-│   └── server.js
+├── backend/                     # Node.js + Express + TypeScript
+│   └── src/
+│       ├── routes/              # API route definitions
+│       ├── controllers/         # Request handlers
+│       ├── middleware/          # Auth & error middleware
+│       ├── services/            # Business logic
+│       └── server.ts
 │
-├── assets/
-│   ├── dashboard-preview.png
-│   ├── artists-dashboard.png
-│   ├── tracks-dashboard.png
-│   ├── playlists-dashboard.png
-│   ├── profile-dashboard.png
-│   └── ai-insights.png
+├── assets/                      # Screenshots & images
+│   └── preview.png
 │
 ├── .gitignore
 └── README.md
 ```
 
-*The directory structure above illustrates the intended organization. Adjust filenames and folders to match the actual implementation.*
-
 ---
 
-## Installation and Setup
-
-Follow these instructions to run the project locally.
+## 🚀 Getting Started
 
 ### Prerequisites
 
-Install the following:
+- [Node.js](https://nodejs.org/) (LTS)
+- [Git](https://git-scm.com/)
+- [Spotify Developer Account](https://developer.spotify.com/dashboard)
+- PostgreSQL *(optional — for database features)*
+- Google Gemini API Key *(optional — for AI features)*
 
-- Node.js
-- npm
-- Git
-- PostgreSQL (if using the database features)
-- Spotify Developer account
-
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 
 ```bash
 git clone https://github.com/priyalllll/Spotify-Intelligence-Studio.git
-```
-
-Navigate into the project:
-
-```bash
 cd Spotify-Intelligence-Studio
 ```
 
-### Step 2: Configure the Backend
+### 2. Configure the Backend
 
 ```bash
 cd backend
 npm install
 ```
 
-Create a `.env` file inside the backend directory.
-
-Example configuration:
+Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
@@ -361,150 +214,86 @@ DATABASE_URL=your_postgresql_connection_string
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-Only configure variables for integrations actually enabled in your project. Follow the environment-variable names expected by your backend code.
+### 3. Configure Spotify Developer App
 
-### Step 3: Configure Spotify Developer Application
+1. Go to [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
+2. Create or open your application
+3. Copy your **Client ID** and **Client Secret**
+4. Add `http://localhost:5000/auth/callback` as a Redirect URI
+5. Paste credentials into your `.env` file
 
-1. Visit [https://developer.spotify.com/dashboard](https://developer.spotify.com/dashboard)
-2. Create or open your Spotify application.
-3. Copy your Spotify Client ID.
-4. Configure the appropriate redirect URI.
-5. Add the credentials to your backend `.env` file.
-6. Ensure the redirect URI matches your application's OAuth configuration.
-
-### Step 4: Configure the Database
-
-If PostgreSQL and Prisma are configured:
+### 4. Set Up the Database *(optional)*
 
 ```bash
+cd backend
 npx prisma generate
 npx prisma migrate dev
 ```
 
-Run these commands from the backend directory, using the database configuration expected by your Prisma schema.
-
-### Step 5: Start the Backend
-
-Open a terminal:
+### 5. Start the Backend
 
 ```bash
 cd backend
 npm run dev
+# Runs at http://localhost:5000
 ```
 
-The backend should run at:
-
-```text
-http://localhost:5000
-```
-
-### Step 6: Start the Frontend
-
-Open another terminal:
+### 6. Start the Frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev
+# Runs at http://localhost:5173
 ```
 
-The Vite development server will display its local URL, typically:
-
-```text
-http://localhost:5173
-```
-
-Open that URL in your browser.
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## Security Considerations
+## 🔒 Security
 
-Security is an important aspect of Spotify account integration.
+- OAuth 2.0 PKCE — no client secret exposed to the browser
+- Tokens stored securely, never committed to GitHub
+- Backend handles all Spotify API communication
+- Environment variables for all sensitive config
+- CORS configured for allowed origins only
 
-The application follows these security considerations:
-
-- OAuth 2.0 PKCE authentication.
-- Authorization-based API access.
-- Secure handling of authentication tokens.
-- Backend-based communication with external APIs.
-- Environment variables for sensitive configuration.
-- Protection of credentials from public repositories.
-- Appropriate error handling for expired or invalid tokens.
-
-Never expose access tokens or refresh tokens in public URLs, screenshots, source code, or GitHub commits.
+> ⚠️ **Never** commit `.env` files or expose access tokens, refresh tokens, or API keys in public repositories.
 
 ---
 
-## Important API Limitations
+## 🔮 Future Enhancements
 
-Spotify API access depends on the permissions granted to the application and the current availability of Spotify endpoints.
-
-Some listening-related information, such as complete historical listening hours, real-time playback history, or detailed audio features, may not be directly available through the API.
-
-Therefore:
-
-- Some metrics may be calculated from available data.
-- Some visualizations may use derived analytical values.
-- Some features may require additional data sources.
-- AI-generated insights depend on the available input data.
-
-The application should distinguish actual Spotify API data from calculated or illustrative metrics.
+- [ ] Advanced listening trend analysis
+- [ ] Music preference clustering with ML
+- [ ] Enhanced AI-powered track recommendations
+- [ ] Exportable PDF intelligence reports
+- [ ] Historical listening analytics
+- [ ] Artist similarity network graph
+- [ ] Mobile-responsive design improvements
+- [ ] Real-time now-playing integration
 
 ---
 
-## Future Enhancements
-
-Potential future improvements include:
-
-- Advanced listening trend analysis.
-- More detailed music preference clustering.
-- Enhanced AI-powered recommendations.
-- Advanced artist similarity analysis.
-- Personalized music discovery.
-- Improved playlist intelligence.
-- Historical listening analytics through additional data sources.
-- Exportable PDF intelligence reports.
-- More advanced data visualization.
-- Enhanced user experience and performance optimization.
-
----
-
-## Learning Outcomes
-
-Developing Spotify Intelligence Studio provides practical experience in:
-
-- Full-stack application development.
-- React and TypeScript.
-- REST API integration.
-- OAuth 2.0 and PKCE authentication.
-- Backend development using Node.js and Express.
-- External API communication.
-- Database integration.
-- Data processing and visualization.
-- AI service integration.
-- Application security and token management.
-
----
-
-## Author
+## 👩‍💻 Author
 
 **Priyal Rathore**
+B.Tech – Computer Engineering | SVKM's NMIMS, Indore
 
-B.Tech – Computer Engineering
-
-SVKM's NMIMS, Indore
-
-GitHub: [@priyalllll](https://github.com/priyalllll)
+[![GitHub](https://img.shields.io/badge/GitHub-priyalllll-181717?style=for-the-badge&logo=github)](https://github.com/priyalllll)
 
 ---
 
-## License
+## 📄 License
 
 This project is developed for educational and portfolio purposes.
 
-Spotify is a trademark of Spotify AB. This project is an independent application and is not affiliated with, endorsed by, or officially connected to Spotify.
+> Spotify is a trademark of Spotify AB. This project is an independent application and is not affiliated with, endorsed by, or officially connected to Spotify.
 
 ---
 
-<p align="center">   <strong>Spotify Intelligence Studio</strong>   \<br/>   Turning Music Data Into Intelligence. </p>
+<p align="center">
+  <strong>🎵 Spotify Intelligence Studio</strong><br/>
+  Turning Music Data Into Intelligence.
+</p>
