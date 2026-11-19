@@ -1,368 +1,336 @@
-import React from 'react';
-import { Sparkles, Brain, Clock, Calendar, Zap, Award, PieChart, Compass, CheckCircle2, Flame, Disc } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import {
+  Sparkles,
+  Brain,
+  Clock,
+  Calendar,
+  Zap,
+  Award,
+  PieChart,
+  Compass,
+  CheckCircle2,
+  Flame,
+  Disc,
+  Activity,
+  Music,
+  BarChart2,
+  TrendingUp,
+  Radio,
+  Loader2,
+  AlertCircle,
+  Volume2,
+  RefreshCw,
+  Sliders,
+  Layers,
+  Heart
+} from 'lucide-react';
+import { spotifyAudioService } from '../../services/spotifyAudioService';
+import { fetchFromBackend } from '../../services/spotifyApiClient';
+import { getCachedAiInsight, setCachedAiInsight } from '../../services/aiCacheService';
+import { AiMusicAssistant } from './AiMusicAssistant';
+import type {
+  SpotifyAudioAnalysisResponse,
+  SpotifyUserProfile,
+  SpotifyArtist,
+  SpotifyTrack,
+  SpotifyPlaylist
+} from '../../types/spotify';
 
-export const AiInsightsView: React.FC = () => {
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+interface AiInsightsViewProps {
+  accessToken?: string;
+}
 
-  const getHeatmapColor = (dayIndex: number, hourIndex: number) => {
-    const isLateNight = hourIndex >= 20 && hourIndex <= 23;
-    const isAfternoon = hourIndex >= 14 && hourIndex <= 17;
+interface AiSectionResult {
+  title: string;
+  key: string;
+  icon: any;
+  color: string;
+  badge: string;
+  prompt: string;
+}
 
-    if (isLateNight && (dayIndex === 3 || dayIndex === 4)) {
-      return 'bg-[#1DB954] shadow-[0_0_8px_rgba(29,185,84,0.6)]';
-    } else if (isLateNight) {
-      return 'bg-[#1DB954]/80';
-    } else if (isAfternoon) {
-      return 'bg-purple-500/70';
-    } else if (hourIndex >= 8 && hourIndex <= 19) {
-      return 'bg-blue-500/40';
-    } else {
-      return 'bg-[#181818]';
+export const AiInsightsView: React.FC<AiInsightsViewProps> = ({ accessToken }) => {
+  const [profile, setProfile] = useState<SpotifyUserProfile | null>(null);
+  const [topArtists, setTopArtists] = useState<SpotifyArtist[]>([]);
+  const [topTracks, setTopTracks] = useState<SpotifyTrack[]>([]);
+  const [playlists, setPlaylists] = useState<SpotifyPlaylist[]>([]);
+  const [analysisData, setAnalysisData] = useState<SpotifyAudioAnalysisResponse | null>(null);
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Active AI Insight Section State & Generated Content Cache
+  const [selectedSectionKey, setSelectedSectionKey] = useState<string>('personality');
+  const [generatedInsights, setGeneratedInsights] = useState<Record<string, string>>({});
+  const [generatingSectionKey, setGeneratingSectionKey] = useState<string | null>(null);
+
+  const aiSections: AiSectionResult[] = [
+    {
+      key: 'personality',
+      title: 'Listening Personality',
+      icon: Brain,
+      color: 'text-purple-400',
+      badge: 'GEMINI AI ARCHETYPE',
+      prompt: 'Analyze my music listening personality and core archetype based on my top creators, acoustic energy, and valence.',
+    },
+    {
+      key: 'mood',
+      title: 'Mood Analysis',
+      icon: Sparkles,
+      color: 'text-amber-400',
+      badge: 'VALENCE SPECTRUM',
+      prompt: 'Provide a detailed emotional mood analysis of my top streamed tracks and acoustic valence breakdown.',
+    },
+    {
+      key: 'productivity',
+      title: 'Productivity Score',
+      icon: Zap,
+      color: 'text-[#1DB954]',
+      badge: 'COGNITIVE FLOW',
+      prompt: 'Calculate my Music Productivity Score (0-100) and explain how my listening matches focus and work flow.',
+    },
+    {
+      key: 'focus',
+      title: 'Focus Music Analysis',
+      icon: Clock,
+      color: 'text-blue-400',
+      badge: 'TEMPO & SPEECH',
+      prompt: 'Analyze my focus music preferences, BPM tempo distribution, and low-speechiness instrumental compatibility.',
+    },
+    {
+      key: 'evolution',
+      title: 'Genre Evolution',
+      icon: TrendingUp,
+      color: 'text-pink-400',
+      badge: 'SPECTRUM SHIFT',
+      prompt: 'Explain how my genre preferences have evolved across my active Spotify listening history.',
+    },
+    {
+      key: 'patterns',
+      title: 'Hidden Listening Patterns',
+      icon: Compass,
+      color: 'text-cyan-400',
+      badge: 'PATTERNS DISCOVERED',
+      prompt: 'Uncover hidden listening patterns, peak session times, and unexpected sonic connections in my library.',
+    },
+    {
+      key: 'recommendations',
+      title: 'Weekly Recommendations',
+      icon: Award,
+      color: 'text-emerald-400',
+      badge: 'CURATED FOR YOU',
+      prompt: 'Provide 5 tailored weekly artist and album recommendations based on my top streamed creators.',
+    },
+    {
+      key: 'insights',
+      title: 'Personalized Insights',
+      icon: Activity,
+      color: 'text-indigo-400',
+      badge: 'EXECUTIVE SUMMARY',
+      prompt: 'Synthesize personalized executive insights summarizing my overall music profile and taste recommendations.',
+    },
+  ];
+
+  // Fetch Telemetry & Initial AI Insights
+  useEffect(() => {
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      fetchFromBackend<SpotifyUserProfile>('/auth/me', accessToken).catch(() => null),
+      fetchFromBackend<{ items?: SpotifyArtist[] }>('/api/top-artists', accessToken).catch(() => null),
+      fetchFromBackend<{ items?: SpotifyTrack[] }>('/api/top-tracks', accessToken).catch(() => null),
+      fetchFromBackend<{ items?: SpotifyPlaylist[] }>('/api/playlists', accessToken).catch(() => null),
+      spotifyAudioService.getAudioAnalysis(accessToken || '').catch(() => null),
+    ])
+      .then(([profData, artistsData, tracksData, playlistsData, audioData]) => {
+        if (profData) setProfile(profData);
+        if (artistsData?.items) setTopArtists(artistsData.items);
+        if (tracksData?.items) setTopTracks(tracksData.items);
+        if (playlistsData?.items) setPlaylists(playlistsData.items);
+        if (audioData) setAnalysisData(audioData);
+      })
+      .catch((err: Error) => {
+        console.error('Error loading AI insights telemetry:', err);
+        setError(err.message);
+      })
+      .finally(() => setLoading(false));
+  }, [accessToken]);
+
+  // Request Section Insight via Gemini API with Caching
+  const generateSectionInsight = async (section: AiSectionResult) => {
+    const cacheKey = `${section.key}_${profile?.id || 'user'}_${topArtists[0]?.id || 'artists'}`;
+    const cached = getCachedAiInsight(cacheKey);
+
+    if (cached) {
+      setGeneratedInsights((prev) => ({ ...prev, [section.key]: cached }));
+      return;
+    }
+
+    setGeneratingSectionKey(section.key);
+
+    try {
+      const res = await fetch('http://localhost:5000/ai/music-insights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          profile,
+          topArtists,
+          topTracks,
+          playlists,
+          audioFeatures: analysisData?.audio_features || [],
+          prompt: section.prompt,
+        }),
+      });
+
+      const data = await res.json();
+      const answerText = data.answer || 'Unable to generate Gemini AI analysis.';
+
+      setCachedAiInsight(cacheKey, answerText);
+      setGeneratedInsights((prev) => ({ ...prev, [section.key]: answerText }));
+    } catch (err) {
+      console.error('Error generating AI section insight:', err);
+    } finally {
+      setGeneratingSectionKey(null);
     }
   };
 
+  useEffect(() => {
+    if (!loading && topArtists.length > 0) {
+      const currentSec = aiSections.find((s) => s.key === selectedSectionKey);
+      if (currentSec && !generatedInsights[currentSec.key]) {
+        generateSectionInsight(currentSec);
+      }
+    }
+  }, [selectedSectionKey, loading, topArtists]);
+
+  // Loading State UI
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 space-y-4 bg-[#181818]/60 backdrop-blur-md rounded-3xl border border-white/10 p-8 shadow-2xl max-w-6xl mx-auto">
+        <Loader2 className="w-10 h-10 text-purple-400 animate-spin" />
+        <div className="text-center space-y-1">
+          <h3 className="text-lg font-bold font-heading text-white">Initializing Gemini AI Music Analyst</h3>
+          <p className="text-xs text-spotify-muted">Analyzing acoustic features, valence, tempo, and energy distribution from Spotify Web API...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const featuresList = analysisData?.audio_features || [];
+  const tracksList = analysisData?.tracks || topTracks || [];
+  const totalCount = featuresList.length || 1;
+
+  // Dynamic Audio Metrics Calculations
+  const avgDanceability = featuresList.reduce((acc, f) => acc + (f.danceability || 0), 0) / totalCount;
+  const avgEnergy = featuresList.reduce((acc, f) => acc + (f.energy || 0), 0) / totalCount;
+  const avgValence = featuresList.reduce((acc, f) => acc + (f.valence || 0), 0) / totalCount;
+  const avgTempo = featuresList.reduce((acc, f) => acc + (f.tempo || 0), 0) / totalCount;
+
+  const danceabilityPct = Math.round(avgDanceability * 100);
+  const energyPct = Math.round(avgEnergy * 100);
+  const valencePct = Math.round(avgValence * 100);
+  const tempoBpm = Math.round(avgTempo);
+
+  const activeSectionObj = aiSections.find((s) => s.key === selectedSectionKey) || aiSections[0];
+  const activeInsightText = generatedInsights[activeSectionObj.key];
+
   return (
-    <div className="space-y-8">
-      
+    <div className="space-y-8 max-w-6xl mx-auto">
+      {/* Interactive Gemini AI Music Assistant */}
+      <AiMusicAssistant accessToken={accessToken} />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div>
-          <h2 className="text-2xl font-bold font-heading text-white">Music Intelligence</h2>
-          <p className="text-xs text-spotify-muted">Gemini 2.0 AI-generated listening behavior summaries, mood analytics, and habit trends</p>
+          <h2 className="text-2xl font-bold font-heading text-white">Gemini AI Music Intelligence Suite</h2>
+          <p className="text-xs text-spotify-muted">
+            8 deep AI analysis dimensions generated directly from your live Spotify account telemetry with intelligent response caching
+          </p>
         </div>
 
         <div className="flex items-center gap-2 text-xs font-mono text-purple-300 bg-purple-500/15 px-3.5 py-1.5 rounded-full border border-purple-500/30 shadow-md">
           <Sparkles className="w-4 h-4 text-purple-400 animate-pulse" />
-          <span>Gemini 2.0 AI Model Active</span>
+          <span>Gemini 2.0 AI Integration Active</span>
         </div>
       </div>
 
-      {/* 1. Music Personality Card (Hero Banner) */}
-      <div className="bg-gradient-to-r from-[#242424] via-[#181818] to-[#242424] p-6 sm:p-8 rounded-2xl border border-purple-500/40 shadow-2xl space-y-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      {/* 8 AI Analysis Section Navigation Tabs */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+        {aiSections.map((sec) => {
+          const IconComp = sec.icon;
+          const isActive = selectedSectionKey === sec.key;
+          return (
+            <button
+              key={sec.key}
+              onClick={() => setSelectedSectionKey(sec.key)}
+              className={`p-3 rounded-2xl border text-left transition-all duration-200 flex flex-col justify-between space-y-2 ${
+                isActive
+                  ? 'bg-[#1DB954] text-black border-[#1DB954] font-bold shadow-lg scale-105'
+                  : 'bg-[#242424] hover:bg-[#2A2A2A] text-spotify-muted hover:text-white border-white/10'
+              }`}
+            >
+              <div className="flex items-center justify-between">
+                <IconComp className={`w-4 h-4 ${isActive ? 'text-black' : sec.color}`} />
+                {generatedInsights[sec.key] && (
+                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-black' : 'bg-[#1DB954]'}`}></span>
+                )}
+              </div>
+              <span className="text-xs font-semibold tracking-tight block truncate">{sec.title}</span>
+            </button>
+          );
+        })}
+      </div>
 
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-[#1DB954] to-purple-500 flex items-center justify-center text-black font-extrabold shadow-[0_0_25px_rgba(29,185,84,0.4)] shrink-0">
-              <Brain className="w-8 h-8 text-black" />
+      {/* Active AI Analysis Section Card */}
+      <div className="bg-[#242424] p-6 sm:p-8 rounded-3xl border border-purple-500/40 shadow-2xl space-y-4 relative overflow-hidden">
+        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-2.5 rounded-2xl bg-[#181818] border border-white/5 ${activeSectionObj.color}`}>
+              <activeSectionObj.icon className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-purple-400 uppercase tracking-widest">AI Archetype Profile</span>
-                <span className="text-[10px] font-mono bg-[#1DB954]/20 text-[#1DB954] px-2 py-0.5 rounded font-bold">96.4% CONFIDENCE</span>
-              </div>
-              <h3 className="text-2xl font-extrabold font-heading text-white mt-1">Deep Flow Synthwave Specialist</h3>
-              <p className="text-xs text-spotify-muted">Characterized by high late-night focus, optimistic valence stability, and electronic affinity</p>
-            </div>
-          </div>
-
-          <div className="bg-[#121212]/80 px-4 py-3 rounded-xl border border-white/5 text-right font-mono shrink-0">
-            <span className="text-[10px] text-spotify-muted block uppercase">AI Model Accuracy</span>
-            <span className="text-lg font-bold text-[#1DB954]">96.4% Score</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. Four Listening Pattern Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
-        {/* Peak Listening Time */}
-        <div className="bg-[#242424] hover:bg-[#2A2A2A] p-5 rounded-2xl border border-white/10 space-y-2 shadow-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-spotify-muted font-semibold">Peak Listening Time</span>
-            <div className="p-2 rounded-xl bg-[#181818] text-[#1DB954]">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-bold font-heading text-white">11:00 PM – 1:00 AM</div>
-          <span className="text-[11px] font-mono text-[#1DB954] block">Late Night Focus Window</span>
-        </div>
-
-        {/* Favorite Day */}
-        <div className="bg-[#242424] hover:bg-[#2A2A2A] p-5 rounded-2xl border border-white/10 space-y-2 shadow-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-spotify-muted font-semibold">Favorite Day</span>
-            <div className="p-2 rounded-xl bg-[#181818] text-purple-400">
-              <Calendar className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-bold font-heading text-white">Thursday</div>
-          <span className="text-[11px] font-mono text-purple-300 block">34% of weekly stream volume</span>
-        </div>
-
-        {/* Average Session */}
-        <div className="bg-[#242424] hover:bg-[#2A2A2A] p-5 rounded-2xl border border-white/10 space-y-2 shadow-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-spotify-muted font-semibold">Average Session</span>
-            <div className="p-2 rounded-xl bg-[#181818] text-blue-400">
-              <Zap className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-bold font-heading text-white">2.8 Hours</div>
-          <span className="text-[11px] font-mono text-blue-300 block">Deep focus flow sessions</span>
-        </div>
-
-        {/* Longest Streak */}
-        <div className="bg-[#242424] hover:bg-[#2A2A2A] p-5 rounded-2xl border border-white/10 space-y-2 shadow-xl">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-spotify-muted font-semibold">Longest Streak</span>
-            <div className="p-2 rounded-xl bg-[#181818] text-amber-400">
-              <Award className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="text-xl font-bold font-heading text-white">14 Days</div>
-          <span className="text-[11px] font-mono text-amber-300 block">Consecutive listening streak</span>
-        </div>
-
-      </div>
-
-      {/* 3. Mood Analysis & AI Recommendations Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Mood Analysis Donut Chart (Span 6) */}
-        <div className="lg:col-span-6 bg-[#242424] p-5 rounded-2xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[#181818] text-purple-400 border border-white/5">
-                <PieChart className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold font-heading text-white">Emotional Mood Valence Distribution</h3>
-                <p className="text-[11px] text-spotify-muted">Psychological listening mood breakdown</p>
-              </div>
-            </div>
-            <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">
-              OPTIMISTIC
-            </span>
-          </div>
-
-          <div className="flex items-center justify-center py-2 relative">
-            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 36 36">
-              <path className="text-[#181818]" strokeWidth="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path className="text-[#1DB954]" strokeDasharray="42, 100" strokeWidth="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path className="text-purple-500" strokeDasharray="34, 100" strokeDashoffset="-42" strokeWidth="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path className="text-blue-500" strokeDasharray="14, 100" strokeDashoffset="-76" strokeWidth="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              <path className="text-amber-500" strokeDasharray="10, 100" strokeDashoffset="-90" strokeWidth="4.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-            </svg>
-
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-              <span className="text-xl font-extrabold font-heading text-white">42%</span>
-              <span className="text-[10px] text-spotify-muted uppercase font-mono tracking-wider">Energetic</span>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-white/5">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#1DB954]"></span>
-              <span className="text-spotify-muted text-[11px]">Energetic (42%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
-              <span className="text-spotify-muted text-[11px]">Focused/Flow (34%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-              <span className="text-spotify-muted text-[11px]">Melancholic (14%)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-              <span className="text-spotify-muted text-[11px]">Euphoric (10%)</span>
-            </div>
-          </div>
-        </div>
-
-        {/* AI Recommendations for Artists & Genres (Span 6) */}
-        <div className="lg:col-span-6 bg-[#242424] p-5 rounded-2xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[#181818] text-[#1DB954] border border-white/5">
-                <Compass className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold font-heading text-white">AI Algorithmic Match Matrix</h3>
-                <p className="text-[11px] text-spotify-muted">Sonic fingerprint affinity predictions</p>
-              </div>
-            </div>
-            <span className="text-[10px] font-mono bg-[#1DB954]/10 text-[#1DB954] px-2 py-0.5 rounded">
-              98% MAX MATCH
-            </span>
-          </div>
-
-          <div className="space-y-2.5">
-            {[
-              { name: 'Lorn', sub: 'Dark Ambient / Electronic', score: '98% Sonic Match' },
-              { name: 'Tycho', sub: 'Chillwave / Downtempo', score: '96% Sonic Match' },
-              { name: 'Solar Fields', sub: 'Psybient Focus Flow', score: '94% Sonic Match' },
-              { name: 'Kavinsky', sub: 'Synthwave / Electro', score: '92% Sonic Match' },
-            ].map((item) => (
-              <div key={item.name} className="bg-[#181818] p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
-                <div>
-                  <span className="text-xs font-bold text-white block">{item.name}</span>
-                  <span className="text-[10px] text-spotify-muted">{item.sub}</span>
-                </div>
-                <span className="text-[10px] font-mono font-bold bg-[#1DB954]/15 text-[#1DB954] px-2 py-0.5 rounded border border-[#1DB954]/30">
-                  {item.score}
+                <span className="text-[10px] font-mono font-bold text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded border border-purple-500/20">
+                  {activeSectionObj.badge}
+                </span>
+                <span className="text-[10px] font-mono text-[#1DB954] bg-[#1DB954]/10 px-2 py-0.5 rounded">
+                  RESPONSE CACHED
                 </span>
               </div>
+              <h3 className="text-xl font-bold font-heading text-white mt-1">{activeSectionObj.title}</h3>
+            </div>
+          </div>
+
+          <button
+            onClick={() => generateSectionInsight(activeSectionObj)}
+            disabled={generatingSectionKey === activeSectionObj.key}
+            className="px-3.5 py-1.5 rounded-full bg-[#181818] hover:bg-[#1DB954] text-spotify-muted hover:text-black border border-white/10 text-xs font-mono font-bold transition-all flex items-center gap-1.5 shrink-0"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${generatingSectionKey === activeSectionObj.key ? 'animate-spin text-[#1DB954]' : ''}`} />
+            <span>Regenerate AI</span>
+          </button>
+        </div>
+
+        {/* Generated AI Content Body */}
+        {generatingSectionKey === activeSectionObj.key ? (
+          <div className="flex flex-col items-center justify-center py-16 space-y-3 bg-[#181818] rounded-2xl border border-white/5">
+            <Loader2 className="w-8 h-8 text-purple-400 animate-spin" />
+            <span className="text-xs font-mono text-purple-300">Querying Gemini 2.0 API with your Spotify telemetry...</span>
+          </div>
+        ) : activeInsightText ? (
+          <div className="bg-[#181818] p-6 rounded-2xl border border-white/5 space-y-3 text-xs sm:text-sm font-sans leading-relaxed text-gray-200">
+            {activeInsightText.split('\n\n').map((paragraph, idx) => (
+              <p key={idx} className="whitespace-pre-wrap">{paragraph}</p>
             ))}
           </div>
-
-          <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-spotify-muted">
-            <span>Recommended Genres:</span>
-            <div className="flex gap-1">
-              <span className="text-[10px] font-mono bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded">Cyberpunk</span>
-              <span className="text-[10px] font-mono bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded">Ambient</span>
-            </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-16 space-y-3 bg-[#181818] rounded-2xl border border-white/5 text-center">
+            <Brain className="w-8 h-8 text-purple-400" />
+            <p className="text-xs text-spotify-muted font-mono max-w-sm">Click "Regenerate AI" or switch tabs to load Gemini AI analysis for {activeSectionObj.title}.</p>
           </div>
-        </div>
-
+        )}
       </div>
-
-      {/* 4. Weekly Listening Summary (Spotify Wrapped Aesthetic) & Gemini Text Summary */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Spotify Wrapped Weekly Card (Span 5) */}
-        <div className="lg:col-span-5 bg-gradient-to-tr from-[#1DB954] via-purple-600 to-[#181818] p-6 rounded-2xl text-white space-y-4 shadow-2xl relative overflow-hidden">
-          <div className="flex items-center justify-between border-b border-white/20 pb-3">
-            <span className="text-xs font-mono font-extrabold uppercase tracking-widest">✦ YOUR WEEK IN TELEMETRY</span>
-            <Disc className="w-5 h-5 text-white animate-spin-slow" />
-          </div>
-
-          <div className="space-y-3 pt-2">
-            <div>
-              <span className="text-[10px] text-white/70 uppercase font-mono">Top Streamed Song</span>
-              <div className="text-xl font-extrabold font-heading text-white">Resonance — HOME</div>
-            </div>
-
-            <div>
-              <span className="text-[10px] text-white/70 uppercase font-mono">Dominant Mood Era</span>
-              <div className="text-lg font-bold font-heading text-white">Late Night Focus Flow</div>
-            </div>
-
-            <div className="flex items-center justify-between pt-2 text-xs font-mono border-t border-white/20">
-              <span>Total Stream Time:</span>
-              <span className="font-bold text-white">42,850 Mins</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Gemini AI Natural Language Text Summary (Span 7) */}
-        <div className="lg:col-span-7 bg-[#242424] p-6 rounded-2xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <div className="flex items-center gap-2 text-purple-400 font-bold text-sm">
-              <Sparkles className="w-4 h-4" />
-              <span>Gemini 2.0 Behavioral Listening Summary</span>
-            </div>
-            <span className="text-[10px] font-mono text-spotify-subtle">Updated 10m ago</span>
-          </div>
-
-          <p className="text-xs text-gray-200 leading-relaxed font-sans bg-[#181818] p-4 rounded-xl border border-white/5">
-            "Your listening history exhibits a <strong className="text-[#1DB954]">Distinct Late Night Productivity Flow</strong>. You consistently switch from upbeat indie rock during afternoon work to high-focus 120–130 BPM Synthwave instrumentals past 10 PM. Your emotional valence remains steadily resilient with zero abrupt mood drops."
-          </p>
-
-          <div className="flex items-center justify-between text-xs font-mono text-[#1DB954] pt-2 border-t border-white/5">
-            <span>✦ Valence Stability: 92/100</span>
-            <span>✦ Acoustic Energy Index: 82/100</span>
-          </div>
-        </div>
-
-      </div>
-
-      {/* 5. Heatmap & Listening Challenges */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        {/* Heatmap (Span 6) */}
-        <div className="lg:col-span-6 bg-[#242424] p-5 rounded-2xl border border-white/10 space-y-4 shadow-xl">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[#181818] text-[#1DB954] border border-white/5">
-                <Calendar className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold font-heading text-white">7x24 Activity Matrix Heatmap</h3>
-                <p className="text-[11px] text-spotify-muted">Weekly listening hour intensity</p>
-              </div>
-            </div>
-            <span className="text-[10px] font-mono text-[#1DB954] bg-[#1DB954]/10 px-2 py-0.5 rounded">
-              PEAK: 11 PM
-            </span>
-          </div>
-
-          <div className="space-y-1.5 pt-1 overflow-x-auto">
-            {days.map((day, dIdx) => (
-              <div key={day} className="flex items-center gap-1.5">
-                <span className="w-8 text-[10px] font-mono text-spotify-muted font-semibold">{day}</span>
-                <div className="flex gap-1 flex-1">
-                  {Array.from({ length: 24 }).map((_, hIdx) => (
-                    <div
-                      key={hIdx}
-                      className={`h-4 flex-1 rounded-sm transition-all duration-200 hover:scale-125 cursor-pointer ${getHeatmapColor(dIdx, hIdx)}`}
-                      title={`${day} ${hIdx}:00 — Telemetry Activity`}
-                    ></div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Listening Challenges with Progress Bars (Span 6) */}
-        <div className="lg:col-span-6 bg-[#242424] p-5 rounded-2xl border border-white/10 space-y-4 shadow-xl flex flex-col justify-between">
-          <div className="flex items-center justify-between border-b border-white/5 pb-3">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-lg bg-[#181818] text-amber-400 border border-white/5">
-                <Flame className="w-4 h-4" />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold font-heading text-white">Active Listening Challenges</h3>
-                <p className="text-[11px] text-spotify-muted">Achievement milestones & progress</p>
-              </div>
-            </div>
-            <span className="text-[10px] font-mono text-[#1DB954] bg-[#1DB954]/10 px-2 py-0.5 rounded">
-              2 / 3 COMPLETED
-            </span>
-          </div>
-
-          <div className="space-y-3 pt-1">
-            
-            <div className="space-y-1 bg-[#181818] p-3 rounded-xl border border-white/5">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-white">Explore 5 New Indie Electronic Artists</span>
-                <span className="text-[#1DB954] font-mono">4 / 5 (80%)</span>
-              </div>
-              <div className="w-full h-2 bg-[#121212] rounded-full overflow-hidden">
-                <div className="h-full bg-[#1DB954] rounded-full w-[80%]"></div>
-              </div>
-            </div>
-
-            <div className="space-y-1 bg-[#181818] p-3 rounded-xl border border-[#1DB954]/30">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-white flex items-center gap-1.5">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#1DB954]" />
-                  Maintain 7-Day Focus Streak
-                </span>
-                <span className="text-[#1DB954] font-mono">7 / 7 (100%)</span>
-              </div>
-              <div className="w-full h-2 bg-[#121212] rounded-full overflow-hidden">
-                <div className="h-full bg-[#1DB954] rounded-full w-[100%]"></div>
-              </div>
-            </div>
-
-            <div className="space-y-1 bg-[#181818] p-3 rounded-xl border border-white/5">
-              <div className="flex justify-between text-xs font-semibold">
-                <span className="text-white">Listen to 10 Hours of High Valence BPM</span>
-                <span className="text-purple-300 font-mono">8.5 / 10 hrs (85%)</span>
-              </div>
-              <div className="w-full h-2 bg-[#121212] rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 rounded-full w-[85%]"></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
     </div>
   );
 };

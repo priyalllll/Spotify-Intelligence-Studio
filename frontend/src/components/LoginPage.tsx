@@ -12,23 +12,23 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToHo
 
   const handleSpotifyAuth = () => {
     setIsAuthenticating(true);
-    
+
     confetti({
       particleCount: 100,
       spread: 80,
       origin: { y: 0.4 },
-      colors: ['#1DB954', '#1ED760', '#FFFFFF', '#A855F7']
+      colors: ['#1DB954', '#1ED760', '#FFFFFF', '#A855F7'],
     });
 
-    setTimeout(() => {
-      setIsAuthenticating(false);
-      onLoginSuccess();
-    }, 1800);
+    // Redirect to Express backend
+    window.location.href = "http://localhost:5000/auth/login";
   };
+
+
 
   return (
     <div className="min-h-screen bg-[#121212] text-white flex flex-col justify-between selection:bg-[#1DB954] selection:text-black relative overflow-hidden">
-      
+
       {/* Background Ambient Glowing Orbs */}
       <div className="absolute top-1/4 left-10 w-[500px] h-[500px] bg-[#1DB954]/15 rounded-full blur-[150px] pointer-events-none -z-0"></div>
       <div className="absolute bottom-10 right-10 w-[400px] h-[400px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none -z-0"></div>
@@ -52,10 +52,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToHo
       {/* Split-Screen Container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full my-auto py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
-          
+
           {/* Left Panel: Branding & Telemetry Showcase */}
           <div className="lg:col-span-6 space-y-8 text-left">
-            
+
             {/* Logo Mark */}
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-[#1DB954] flex items-center justify-center shadow-[0_0_20px_rgba(29,185,84,0.5)]">
@@ -92,7 +92,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToHo
 
             {/* Floating Telemetry Showcase Cards */}
             <div className="space-y-3 pt-2">
-              
+
               <div className="bg-[#181818]/90 backdrop-blur-md p-4 rounded-xl border border-white/10 flex items-start gap-3 shadow-xl hover:border-[#1DB954]/40 transition-colors">
                 <div className="p-2 rounded-lg bg-purple-500/20 text-purple-400 shrink-0">
                   <Sparkles className="w-4 h-4" />
@@ -129,22 +129,22 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToHo
 
           {/* Right Panel: Centered Glassmorphic Login Card */}
           <div className="lg:col-span-6 flex justify-center">
-            
+
             <div className="relative w-full max-w-md">
-              
+
               {/* Outer Card Glow */}
               <div className="absolute -inset-1 rounded-3xl bg-gradient-to-r from-[#1DB954]/30 to-purple-600/30 blur-xl opacity-60"></div>
 
               {/* Login Card Container */}
               <div className="relative bg-[#181818] border border-white/10 rounded-3xl p-8 sm:p-10 shadow-2xl space-y-8">
-                
+
                 {/* Header */}
                 <div className="text-center space-y-3">
-                  
+
                   {/* Spotify Green Logo Icon */}
                   <div className="w-14 h-14 rounded-full bg-[#1DB954] flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(29,185,84,0.4)]">
                     <svg className="w-8 h-8 fill-current text-black" viewBox="0 0 24 24">
-                      <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C13.56 8.4 7.56 8.16 4.14 9.18c-.6.18-1.26-.18-1.44-.78-.18-.6.18-1.26.78-1.44C7.38 5.76 14.04 6 18.48 8.64c.54.3.72 1.02.42 1.56-.24.48-.96.72-1.5.42z"/>
+                      <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C13.56 8.4 7.56 8.16 4.14 9.18c-.6.18-1.26-.18-1.44-.78-.18-.6.18-1.26.78-1.44C7.38 5.76 14.04 6 18.48 8.64c.54.3.72 1.02.42 1.56-.24.48-.96.72-1.5.42z" />
                     </svg>
                   </div>
 
@@ -172,7 +172,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess, onBackToHo
                     ) : (
                       <>
                         <svg className="w-5 h-5 fill-current text-black" viewBox="0 0 24 24">
-                          <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C13.56 8.4 7.56 8.16 4.14 9.18c-.6.18-1.26-.18-1.44-.78-.18-.6.18-1.26.78-1.44C7.38 5.76 14.04 6 18.48 8.64c.54.3.72 1.02.42 1.56-.24.48-.96.72-1.5.42z"/>
+                          <path d="M12 0C5.376 0 0 5.376 0 12s5.376 12 12 12 12-5.376 12-12S18.624 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141 C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C13.56 8.4 7.56 8.16 4.14 9.18c-.6.18-1.26-.18-1.44-.78-.18-.6.18-1.26.78-1.44C7.38 5.76 14.04 6 18.48 8.64c.54.3.72 1.02.42 1.56-.24.48-.96.72-1.5.42z" />
                         </svg>
                         <span>Continue with Spotify</span>
                       </>

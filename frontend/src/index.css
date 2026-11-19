@@ -1,31 +1,104 @@
 @import "tailwindcss";
 
-html {
+@layer base {
+  html {
     scroll-behavior: smooth;
-}
+    color-scheme: dark;
+  }
 
-body {
+  body {
     margin: 0;
     min-width: 320px;
-    background: #000;
-    color: white;
-    font-family: Inter, system-ui, sans-serif;
+    background-color: #000000;
+    color: #ffffff;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* Accessible Focus Ring Indicators */
+  *:focus-visible {
+    outline: 2px solid #1DB954 !important;
+    outline-offset: 2px !important;
+  }
 }
 
-* {
-    box-sizing: border-box;
+/* Custom Scrollbar Utilities */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-a {
-    text-decoration: none;
-    color: inherit;
+::-webkit-scrollbar-track {
+  background: #121212;
 }
 
-button {
-    font: inherit;
+::-webkit-scrollbar-thumb {
+  background: #282828;
+  border-radius: 9999px;
 }
 
-img {
-    max-width: 100%;
-    display: block;
+::-webkit-scrollbar-thumb:hover {
+  background: #1DB954;
+}
+
+/* Custom Micro-Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+/* Glassmorphism Card System */
+.glass-card {
+  background: rgba(36, 36, 36, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.5rem;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  border-color: rgba(29, 185, 84, 0.3);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(29, 185, 84, 0.15);
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, #181818 25%, #282828 50%, #181818 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite;
 }

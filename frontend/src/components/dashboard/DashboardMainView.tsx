@@ -4,20 +4,24 @@ import { ChartsGrid } from './ChartsGrid';
 import { AiInsightsPanel } from './AiInsightsPanel';
 import { RecentlyPlayedTable } from './RecentlyPlayedTable';
 
-export const DashboardMainView: React.FC = () => {
+interface DashboardMainViewProps {
+  accessToken?: string;
+}
+
+export const DashboardMainView: React.FC<DashboardMainViewProps> = ({ accessToken }) => {
   return (
     <div className="space-y-6">
-      {/* 6 KPI Cards */}
-      <KpiCards />
+      {/* 10 Calculated Real-Time Spotify Telemetry Metrics */}
+      <KpiCards accessToken={accessToken} />
 
-      {/* Interactive Data Visualizations (Line, Bar, Donut, Heatmap) */}
-      <ChartsGrid />
+      {/* 6 Recharts Live Interactive Visualizations */}
+      <ChartsGrid accessToken={accessToken} />
 
       {/* Gemini AI Insights Panel */}
       <AiInsightsPanel />
 
       {/* Recently Played Streams Log */}
-      <RecentlyPlayedTable />
+      <RecentlyPlayedTable accessToken={accessToken} />
     </div>
   );
 };

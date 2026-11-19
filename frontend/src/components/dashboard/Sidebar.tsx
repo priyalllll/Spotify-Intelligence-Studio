@@ -1,7 +1,40 @@
 import React from 'react';
-import { LayoutDashboard, Users, Music, Library, Sparkles, User, Settings, Disc, ChevronLeft, ChevronRight, ArrowLeftRight } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  Music,
+  Library,
+  Sparkles,
+  FileText,
+  Activity,
+  User,
+  Settings,
+  Disc,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeftRight,
+  BarChart2,
+  Gift,
+  Brain,
+  Bot,
+  Server
+} from 'lucide-react';
 
-export type DashboardViewType = 'dashboard' | 'artists' | 'tracks' | 'playlists' | 'ai' | 'profile' | 'settings';
+export type DashboardViewType =
+  | 'dashboard'
+  | 'analytics'
+  | 'wrapped'
+  | 'advisor'
+  | 'coach'
+  | 'monitoring'
+  | 'artists'
+  | 'tracks'
+  | 'playlists'
+  | 'ai'
+  | 'report'
+  | 'scores'
+  | 'profile'
+  | 'settings';
 
 interface SidebarProps {
   currentView: DashboardViewType;
@@ -9,6 +42,7 @@ interface SidebarProps {
   collapsed: boolean;
   onToggleCollapse: () => void;
   onSwitchToLanding: () => void;
+  accessToken?: string;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,13 +51,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   collapsed,
   onToggleCollapse,
   onSwitchToLanding,
+  accessToken,
 }) => {
+  const isConnected = Boolean(accessToken);
+
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null },
+    { id: 'analytics', label: 'Advanced Analytics', icon: BarChart2, badge: '9 Charts' },
+    { id: 'wrapped', label: 'Spotify Wrapped', icon: Gift, badge: '2026' },
+    { id: 'advisor', label: 'AI Music Advisor', icon: Bot, badge: 'NEW' },
+    { id: 'coach', label: 'Music Coach', icon: Brain, badge: 'Gemini' },
+    { id: 'monitoring', label: 'System Monitoring', icon: Server, badge: 'Admin' },
     { id: 'artists', label: 'Top Artists', icon: Users, badge: '348' },
     { id: 'tracks', label: 'Tracks & Features', icon: Music, badge: '1.4k' },
     { id: 'playlists', label: 'Playlists', icon: Library, badge: '24' },
     { id: 'ai', label: 'AI Insights', icon: Sparkles, badge: 'Gemini' },
+    { id: 'report', label: 'Intelligence Report', icon: FileText, badge: 'Flagship' },
+    { id: 'scores', label: 'Intelligence Scores', icon: Activity, badge: '8 Scores' },
     { id: 'profile', label: 'Profile', icon: User, badge: null },
     { id: 'settings', label: 'Settings', icon: Settings, badge: null },
   ];
@@ -34,11 +78,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         collapsed ? 'w-20' : 'w-64'
       }`}
     >
-      {/* Top Header */}
       <div>
         <div className="p-4 flex items-center justify-between border-b border-white/10">
           <div
-            onClick={() => onSelectView('dashboard')}
+            onClick={() => {
+              onSelectView('dashboard');
+            }}
             className="flex items-center gap-3 cursor-pointer overflow-hidden"
           >
             <div className="w-10 h-10 rounded-full bg-[#1DB954] flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(29,185,84,0.4)]">
@@ -65,7 +110,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Switch to Landing Page Button */}
         <div className="p-3 border-b border-white/5">
           <button
             onClick={onSwitchToLanding}
@@ -79,8 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        {/* Navigation Items */}
-        <nav className="p-3 space-y-1.5">
+        <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-180px)]">
           {navItems.map((item) => {
             const IconComponent = item.icon;
             const isActive = currentView === item.id;
@@ -88,7 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 key={item.id}
                 onClick={() => onSelectView(item.id as DashboardViewType)}
-                className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-semibold transition-all duration-200 group relative ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 group relative ${
                   isActive
                     ? 'bg-[#1DB954] text-black shadow-[0_4px_20px_rgba(29,185,84,0.3)]'
                     : 'text-spotify-muted hover:text-white hover:bg-[#242424]'
@@ -103,7 +146,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {!collapsed && item.badge && (
                   <span
                     className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
-                      isActive ? 'bg-black/20 text-black' : 'bg-[#121212] text-[#1DB954] border border-[#1DB954]/30'
+                      isActive
+                        ? 'bg-black/20 text-black'
+                        : 'bg-[#121212] text-[#1DB954] border border-[#1DB954]/30'
                     }`}
                   >
                     {item.badge}
@@ -120,14 +165,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!collapsed ? (
           <div className="space-y-2 text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#1DB954] animate-ping"></span>
-              <span className="text-white font-semibold">Spotify Connected</span>
+              <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-[#1DB954] animate-ping' : 'bg-amber-500'}`}></span>
+              <span className="text-white font-semibold">{isConnected ? 'Spotify Connected' : 'Session Pending'}</span>
             </div>
-            <p className="text-[10px] text-spotify-subtle font-mono">OAuth 2.0 PKCE Handshake Active</p>
+            <p className="text-[10px] text-spotify-subtle font-mono">
+              {isConnected ? 'OAuth 2.0 PKCE Active' : 'Login Required'}
+            </p>
           </div>
         ) : (
-          <div className="flex justify-center" title="Spotify Connected">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#1DB954] animate-ping"></span>
+          <div className="flex justify-center" title={isConnected ? 'Spotify Connected' : 'Session Pending'}>
+            <span className={`w-2.5 h-2.5 rounded-full ${isConnected ? 'bg-[#1DB954] animate-ping' : 'bg-amber-500'}`}></span>
           </div>
         )}
       </div>

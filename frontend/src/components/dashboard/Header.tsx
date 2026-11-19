@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Search, Bell, ChevronDown, Sparkles, ExternalLink } from 'lucide-react';
+import { Search, Bell, ChevronDown, Sparkles, ExternalLink, User, LogIn } from 'lucide-react';
+import type { DashboardViewType } from './Sidebar';
+import type { SpotifyUserProfile } from '../../types/spotify';
+import { API_BASE_URL } from '../../config/env';
 
 export type TimeRangeType = '7d' | '30d' | '6m' | 'all';
 
@@ -9,6 +12,9 @@ interface HeaderProps {
   timeRange: TimeRangeType;
   onTimeRangeChange: (tr: TimeRangeType) => void;
   collapsed: boolean;
+  spotifyUser?: SpotifyUserProfile | null;
+  onSelectView?: (view: DashboardViewType) => void;
+  onOpenSearchModal?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,9 +23,23 @@ export const Header: React.FC<HeaderProps> = ({
   timeRange,
   onTimeRangeChange,
   collapsed,
+  spotifyUser,
+  onSelectView,
+  onOpenSearchModal,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const displayName = spotifyUser?.display_name || 'Spotify User';
+  const avatarUrl = spotifyUser?.images?.[0]?.url;
+  const initialLetter = displayName.charAt(0).toUpperCase() || 'U';
+  const productText = spotifyUser?.product
+    ? `${spotifyUser.product.toUpperCase()} Account`
+    : 'Spotify Account';
+
+  const handleConnectSpotify = () => {
+    window.location.href = `${API_BASE_URL}/auth/login?redirect=true`;
+  };
 
   return (
     <header
@@ -28,19 +48,18 @@ export const Header: React.FC<HeaderProps> = ({
       }`}
     >
       <div className="flex items-center gap-4 flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="w-4 h-4 text-spotify-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search artists, tracks, genres, or playlists... (Ctrl + K)"
-            className="w-full bg-[#242424] text-white text-xs rounded-full pl-10 pr-12 py-2.5 border border-white/10 focus:border-[#1DB954] focus:outline-none transition-all placeholder:text-spotify-subtle"
-          />
+        <button
+          onClick={onOpenSearchModal}
+          className="relative w-full text-left bg-[#242424] hover:bg-[#2A2A2A] text-white text-xs rounded-full pl-10 pr-12 py-2.5 border border-white/10 focus:border-[#1DB954] transition-all flex items-center justify-between group"
+        >
+          <Search className="w-4 h-4 text-spotify-muted group-hover:text-[#1DB954] absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors" />
+          <span className="text-spotify-subtle truncate">
+            {searchQuery ? `Searching: "${searchQuery}"` : 'Global Search artists, tracks, playlists... (Ctrl + K)'}
+          </span>
           <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] font-mono text-spotify-subtle bg-[#121212] px-1.5 py-0.5 rounded border border-white/10">
             Ctrl K
           </kbd>
-        </div>
+        </button>
       </div>
 
       <div className="flex items-center gap-3">
@@ -85,14 +104,14 @@ export const Header: React.FC<HeaderProps> = ({
                   <Sparkles className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                   <div>
                     <p className="text-white font-medium">New AI Taste Summary Ready</p>
-                    <p className="text-spotify-muted text-[11px] mt-0.5">Gemini 2.0 updated your Synthwave focus flow profile.</p>
+                    <p className="text-spotify-muted text-[11px] mt-0.5">Gemini 2.0 updated your listening focus flow profile.</p>
                   </div>
                 </div>
                 <div className="p-2.5 rounded-xl bg-[#181818] border border-white/5 flex items-start gap-2.5">
                   <span className="w-2 h-2 rounded-full bg-[#1DB954] shrink-0 mt-1"></span>
                   <div>
-                    <p className="text-white font-medium">Spotify Playlist Sync Complete</p>
-                    <p className="text-spotify-muted text-[11px] mt-0.5">Exported "Deep Focus 128 BPM" to Spotify library.</p>
+                    <p className="text-white font-medium">Spotify Profile Synchronized</p>
+                    <p className="text-spotify-muted text-[11px] mt-0.5">Telemetry workspace synced with active Spotify account.</p>
                   </div>
                 </div>
               </div>
@@ -100,36 +119,68 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <div className="relative">
-          <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#242424] hover:bg-[#2A2A2A] border border-white/10 transition-colors"
-          >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1DB954] to-purple-500 flex items-center justify-center font-bold text-black text-xs">
-              P
-            </div>
-            <span className="text-xs font-semibold text-white hidden sm:inline">Priya S.</span>
-            <ChevronDown className="w-3.5 h-3.5 text-spotify-muted" />
-          </button>
+        {spotifyUser ? (
+          <div className="relative">
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-full bg-[#242424] hover:bg-[#2A2A2A] border border-white/10 transition-colors"
+            >
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={displayName}
+                  className="w-7 h-7 rounded-full object-cover border border-[#1DB954]"
+                />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-[#1DB954] to-purple-500 flex items-center justify-center font-bold text-black text-xs">
+                  {initialLetter}
+                </div>
+              )}
+              <span className="text-xs font-semibold text-white hidden sm:inline">{displayName}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-spotify-muted" />
+            </button>
 
-          {showProfileMenu && (
-            <div className="absolute right-0 mt-2 w-56 bg-[#242424] border border-white/10 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
-              <div className="px-3 py-2 border-b border-white/5">
-                <p className="text-xs font-bold text-white">Priya S.</p>
-                <p className="text-[10px] text-spotify-muted font-mono">Spotify Premium Account</p>
+            {showProfileMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-[#242424] border border-white/10 rounded-2xl shadow-2xl p-2 z-50 space-y-1">
+                <div className="px-3 py-2 border-b border-white/5">
+                  <p className="text-xs font-bold text-white truncate">{displayName}</p>
+                  <p className="text-[10px] text-spotify-muted font-mono">{productText}</p>
+                </div>
+
+                {onSelectView && (
+                  <button
+                    onClick={() => {
+                      onSelectView('profile');
+                      setShowProfileMenu(false);
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-spotify-muted hover:text-white hover:bg-[#181818] transition-colors text-left"
+                  >
+                    <User className="w-3.5 h-3.5 text-[#1DB954]" />
+                    <span>View Account Profile</span>
+                  </button>
+                )}
+
+                <a
+                  href={spotifyUser?.external_urls?.spotify || "https://spotify.com"}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-spotify-muted hover:text-white hover:bg-[#181818] transition-colors"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-[#1DB954]" />
+                  <span>Open Spotify App</span>
+                </a>
               </div>
-              <a
-                href="https://spotify.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs text-spotify-muted hover:text-white hover:bg-[#181818] transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-[#1DB954]" />
-                <span>Open Spotify App</span>
-              </a>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <button
+            onClick={handleConnectSpotify}
+            className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#1DB954] hover:bg-[#1ED760] text-black font-extrabold text-xs shadow-lg transition-transform hover:scale-105"
+          >
+            <LogIn className="w-3.5 h-3.5" />
+            <span>Connect Spotify</span>
+          </button>
+        )}
 
       </div>
     </header>
