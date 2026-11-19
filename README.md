@@ -1,6 +1,6 @@
-﻿# Spotify Intelligence Studio
+﻿<h1 align="center">Spotify Intelligence Studio</h1>
 
-### An AI-Powered Music Analytics & Intelligence Platform
+<h3 align="center">An AI-Powered Music Analytics &amp; Intelligence Platform</h3>
 
 <p align="center">
 <strong>Transforming Spotify listening data into meaningful music intelligence.</strong>
